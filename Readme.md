@@ -1,3 +1,5 @@
+*注: 挂接到实际应用, 这样面试问起, 可举例
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
@@ -121,11 +123,12 @@
 
 
 
-
-
 # Python语言特性
 
+
 ## 1 Python的函数参数传递
+
+> 总而言之：可更改对象传参后是对象引用（影响传参前），不可更改对象传参后是值引用（复制了一份，不影响传参前）
 
 看两个例子:
 
@@ -134,7 +137,7 @@ a = 1
 def fun(a):
     a = 2
 fun(a)
-print a  # 1
+print(a)  # 1
 ```
 
 ```python
@@ -142,7 +145,7 @@ a = []
 def fun(a):
     a.append(1)
 fun(a)
-print a  # [1]
+print(a)  # [1]
 ```
 
 所有的变量都可以理解是内存中一个对象的“引用”，或者，也可以看似c中void*的感觉。
@@ -152,12 +155,12 @@ print a  # [1]
 ```python
 a = 1
 def fun(a):
-    print "func_in",id(a)   # func_in 41322472
+    print("func_in",id(a))   # func_in 41322472
     a = 2
-    print "re-point",id(a), id(2)   # re-point 41322448 41322448
-print "func_out",id(a), id(1)  # func_out 41322472 41322472
+    print("re-point", id(a), id(2))   # re-point 41322448 41322448
+print("func_out", id(a), id(1))  # func_out 41322472 41322472
 fun(a)
-print a  # 1
+print(a)  # 1
 ```
 
 注：具体的值在不同电脑上运行时可能不同。
@@ -169,11 +172,11 @@ print a  # 1
 ```python
 a = []
 def fun(a):
-    print "func_in",id(a)  # func_in 53629256
+    print("func_in",id(a))  # func_in 53629256
     a.append(1)
-print "func_out",id(a)     # func_out 53629256
+print("func_out",id(a))     # func_out 53629256
 fun(a)
-print a  # [1]
+print(a)  # [1]
 ```
 
 这里记住的是类型是属于对象的，而不是变量。而对象有两种,“可更改”（mutable）与“不可更改”（immutable）对象。在python中，strings, tuples, 和numbers是不可更改的对象，而 list, dict, set 等则是可以修改的对象。(这就是这个问题的重点)
@@ -182,9 +185,13 @@ print a  # [1]
 
 如果还不明白的话,这里有更好的解释: http://stackoverflow.com/questions/986006/how-do-i-pass-a-variable-by-reference
 
+
 ## 2 Python中的元类(metaclass)
 
+> 总而言之：元类用于为一整套类编写一套共用的规则或逻辑
+
 这个非常的不常用,但是像ORM这种复杂的结构还是会需要的,详情请看:http://stackoverflow.com/questions/100003/what-is-a-metaclass-in-python
+
 
 ## 3 @staticmethod和@classmethod
 
@@ -222,11 +229,18 @@ a=A()
 更多关于这个问题:
 1. http://stackoverflow.com/questions/136097/what-is-the-difference-between-staticmethod-and-classmethod-in-python
 2. https://realpython.com/blog/python/instance-class-and-static-methods-demystified/
+
+
 ## 4 类变量和实例变量
+
+> 总而言之：类变量为所有实例共享（通过类访问），实例变量为各个实例独有（通过实例访问，通过实例访问类的变量还是实例变量）  
+但是请注意：类变量如果和实例变量同名，且为**可更改对象**，那么类变量和实例变量指向同一个对象引用  
+所以实际上，**类变量和实例变量类似于函数传参时的函数外变量和函数内变量**  
+例子见以下**粗体**
 
 **类变量：**
 
-> ​	是可在类的所有实例之间共享的值（也就是说，它们不是单独分配给每个实例的）。例如下例中，num_of_instance 就是类变量，用于跟踪存在着多少个Test 的实例。
+> ​是可在类的所有实例之间共享的值（也就是说，它们不是单独分配给每个实例的）。例如下例中，num_of_instance 就是类变量，用于跟踪存在着多少个Test 的实例。
 
 **实例变量：**
 
@@ -240,12 +254,12 @@ class Test(object):
         Test.num_of_instance += 1  
   
 if __name__ == '__main__':  
-    print Test.num_of_instance   # 0
+    print(Test.num_of_instance)   # 0
     t1 = Test('jack')  
-    print Test.num_of_instance   # 1
+    print(Test.num_of_instance)   # 1
     t2 = Test('lucy')  
-    print t1.name , t1.num_of_instance  # jack 2
-    print t2.name , t2.num_of_instance  # lucy 2
+    print(t1.name) , t1.num_of_instance  # jack 2
+    print(t2.name) , t2.num_of_instance  # lucy 2
 ```
 
 > 补充的例子
@@ -257,14 +271,14 @@ class Person:
 p1=Person()
 p2=Person()
 p1.name="bbb"
-print p1.name  # bbb
-print p2.name  # aaa
-print Person.name  # aaa
+print(p1.name)  # bbb
+print(p2.name)  # aaa
+print(Person.name)  # aaa
 ```
 
-这里`p1.name="bbb"`是实例调用了类变量,这其实和上面第一个问题一样,就是函数传参的问题,`p1.name`一开始是指向的类变量`name="aaa"`,但是在实例的作用域里把类变量的引用改变了,就变成了一个实例变量,self.name不再引用Person的类变量name了.
+**这里`p1.name="bbb"`是实例调用了类变量,这其实和上面第一个问题一样,就是函数传参的问题,`p1.name`一开始是指向的类变量`name="aaa"`,但是在实例的作用域里把类变量的引用改变了,就变成了一个实例变量,self.name不再引用Person的类变量name了.**
 
-可以看看下面的例子:
+**可以看看下面的例子:**
 
 ```python
 class Person:
@@ -273,12 +287,13 @@ class Person:
 p1=Person()
 p2=Person()
 p1.name.append(1)
-print p1.name  # [1]
-print p2.name  # [1]
-print Person.name  # [1]
+print(p1.name)  # [1]
+print(p2.name)  # [1]
+print(Person.name)  # [1]
 ```
 
 参考:http://stackoverflow.com/questions/6470428/catch-multiple-exceptions-in-one-line-except-block
+
 
 ## 5 Python自省
 
@@ -290,10 +305,9 @@ print Person.name  # [1]
 a = [1,2,3]
 b = {'a':1,'b':2,'c':3}
 c = True
-print type(a),type(b),type(c) # <type 'list'> <type 'dict'> <type 'bool'>
-print isinstance(a,list)  # True
+print(type(a),type(b),type(c)) # <type 'list'> <type 'dict'> <type 'bool'>
+print(isinstance(a,list))  # True
 ```
-
 
 
 ## 6 字典推导式
@@ -304,7 +318,10 @@ print isinstance(a,list)  # True
 d = {key: value for (key, value) in iterable}
 ```
 
+
 ## 7 Python中单下划线和双下划线
+
+> 左侧单划私有不导入, 左右双划内部防冲突, 左侧双划被替代(`__foo` -> `_classname__foo`)
 
 ```python
 >>> class MyClass():
@@ -313,11 +330,11 @@ d = {key: value for (key, value) in iterable}
 ...             self._semiprivate = ", world!"
 ...
 >>> mc = MyClass()
->>> print mc.__superprivate
+>>> print(mc.__superprivate)
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 AttributeError: myClass instance has no attribute '__superprivate'
->>> print mc._semiprivate
+>>> print(mc._semiprivate)
 , world!
 >>> print mc.__dict__
 {'_MyClass__superprivate': 'Hello', '_semiprivate': ', world!'}
@@ -327,11 +344,12 @@ AttributeError: myClass instance has no attribute '__superprivate'
 
 `_foo`:一种约定,用来指定变量私有.程序员用来指定私有变量的一种方式.不能用from module import * 导入，其他方面和公有一样访问；
 
-`__foo`:这个有真正的意义:解析器用`_classname__foo`来代替这个名字,以区别和其他类相同的命名,它无法直接像公有成员一样随便访问,通过对象名._类名__xxx这样的方式可以访问.
+`__foo`:这个有真正的意义:解析器用`_classname__foo`来代替这个名字,以区别和其他类相同的命名,它无法直接像公有成员一样随便访问,通过对象名._类名__xxx这样的方式可以访问._
 
 详情见:http://stackoverflow.com/questions/1301346/the-meaning-of-a-single-and-a-double-underscore-before-an-object-name-in-python
 
 或者: http://www.zhihu.com/question/19754941
+
 
 ## 8 字符串格式化:%和.format
 
@@ -356,7 +374,12 @@ AttributeError: myClass instance has no attribute '__superprivate'
 
 http://stackoverflow.com/questions/5082452/python-string-formatting-vs-format
 
-## 9 迭代器和生成器
+
+## 9 迭代器和生成器*/
+
+> 一个迭代器占用的空间为迭代器内所有元素所占空间总和, 而一个生成器占用的空间为已生成的元素所占空间的总和
+生成器为调用一次就迭代一次的迭代器, 当有一个巨大的列表而仅需要访问其前几个元素时, 生成器更具优势
+迭代器举例: `[x*x for x in range(10)]` -> return a list; 生成器举例: `(x*x for x in range(10))` -> return a generator
 
 这个是stackoverflow里python排名第一的问题,值得一看: http://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do-in-python
 
@@ -376,7 +399,10 @@ http://stackoverflow.com/questions/5082452/python-string-formatting-vs-format
 ```
 通过列表生成式，可以直接创建一个列表。但是，受到内存限制，列表容量肯定是有限的。而且，创建一个包含百万元素的列表，不仅是占用很大的内存空间，如：我们只需要访问前面的几个元素，后面大部分元素所占的空间都是浪费的。因此，没有必要创建完整的列表（节省大量内存空间）。在Python中，我们可以采用生成器：边循环，边计算的机制—>generator
 
+
 ## 10 `*args` and `**kwargs`
+
+> `*args`和`**kwargs`可以同时在函数的定义中,但是`*args`必须在`**kwargs`前面. 且不能同时有两个 `**args` 或 `**kwargs` 
 
 用`*args`和`**kwargs`只是为了方便并没有强制使用它们.
 
@@ -425,11 +451,14 @@ def table_things(titlestring, **kwargs)
 a = aardvark, b = baboon, c = cat
 ```
 
-就像你看到的一样,它可以传递列表(或者元组)的每一项并把它们解包.注意必须与它们在函数里的参数相吻合.当然,你也可以在函数定义或者函数调用时用*.
+*就像你看到的一样,它可以传递列表(或者元组)的每一项并把它们解包.注意必须与它们在函数里的参数相吻合.当然,你也可以在函数定义或者函数调用时用*.
 
 http://stackoverflow.com/questions/3394835/args-and-kwargs
 
+
 ## 11 面向切面编程AOP和装饰器
+
+> 概括的讲，装饰器的作用就是为已经存在的对象添加额外的功能。并且这些功能是可重用的。
 
 这个AOP一听起来有点懵,同学面阿里的时候就被问懵了...
 
@@ -439,9 +468,10 @@ http://stackoverflow.com/questions/3394835/args-and-kwargs
 
 中文: http://taizilongxu.gitbooks.io/stackoverflow-about-python/content/3/README.html
 
+
 ## 12 鸭子类型
 
-“当看到一只鸟走起来像鸭子、游泳起来像鸭子、叫起来也像鸭子，那么这只鸟就可以被称为鸭子。”
+> “当看到一只鸟走起来像鸭子、游泳起来像鸭子、叫起来也像鸭子，那么这只鸟就可以被称为鸭子。”
 
 我们并不关心对象是什么类型，到底是不是鸭子，只关心行为。
 
@@ -451,7 +481,10 @@ http://stackoverflow.com/questions/3394835/args-and-kwargs
 
 鸭子类型在动态语言中经常使用，非常灵活，使得python不想java那样专门去弄一大堆的设计模式。
 
+
 ## 13 Python中重载
+
+> 没有显式重载, 可以达到重载目的
 
 引自知乎:http://www.zhihu.com/question/20053359
 
@@ -467,6 +500,7 @@ http://stackoverflow.com/questions/3394835/args-and-kwargs
 那么对于情况 2 ，函数功能相同，但参数个数不同，python 如何处理？大家知道，答案就是缺省参数。对那些缺少的参数设定为缺省参数即可解决问题。因为你假设函数功能相同，那么那些缺少的参数终归是需要用的。
 
 好了，鉴于情况 1 跟 情况 2 都有了解决方案，python 自然就不需要函数重载了。
+
 
 ## 14 新式类和旧式类
 
